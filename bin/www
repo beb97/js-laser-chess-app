@@ -1,0 +1,204 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('socket:server');
+var http = require('http');
+
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+    var port = parseInt(val, 10);
+
+    if (isNaN(port)) {
+        // named pipe
+        return val;
+    }
+
+    if (port >= 0) {
+        // port number
+        return port;
+    }
+
+    return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+    if (error.syscall !== 'listen') {
+        throw error;
+    }
+
+    var bind = typeof port === 'string'
+        ? 'Pipe ' + port
+        : 'Port ' + port;
+
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+        case 'EACCES':
+            console.error(bind + ' requires elevated privileges');
+            process.exit(1);
+            break;
+        case 'EADDRINUSE':
+            console.error(bind + ' is already in use');
+            process.exit(1);
+            break;
+        default:
+            throw error;
+    }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+    var addr = server.address();
+    var bind = typeof addr === 'string'
+        ? 'pipe ' + addr
+        : 'port ' + addr.port;
+    debug('Listening on ' + bind);
+}
+
+/// MY CODE
+var io = require ('socket.io') (server, {});
+var games = new Games();
+var sockets = [];
+
+io.sockets.on ('connection', function (socket) {
+
+
+    socket.id = sockets.length;
+    sockets[socket.id] = socket;
+    socket.other = null;
+    socket.game = null;
+
+    console.log('connexion par socket', socket.id);
+
+    socket.send = function(value) {
+        socket.emit('game', {
+            status:value
+        });
+    };
+
+    socket.sendAction = function(action) {
+        socket.other.emit('addAction', {
+            action:action
+        });
+    };
+
+    socket.kill = function() {
+        socket.send('over');
+        socket.game = null;
+        socket.other = null;
+    };
+
+    socket.on('sendAction', function (data) {
+        console.log('action ' + data);
+        socket.sendAction(data);
+    });
+
+    socket.on('join', function (data) {
+        games.joinGame(data.name, socket);
+    });
+
+    socket.on('disconnect', function() {
+        if (socket.other) {
+            socket.other.kill();
+            games.list.length=0;
+        }
+        console.log('died socket', socket.id);
+        delete sockets[socket.id];
+        socket.kill();
+    });
+
+
+});
+
+function Games() {
+    this.list = [],
+
+        this.add = function(game) {
+            this.list.push(game);
+            return game;
+        },
+
+        this.createGame = function(name, player) {
+                console.log(player.id, 'created game ', name);
+                player.game = this.add(new Game(name,player));
+                player.send('created');
+        },
+
+        this.findGame = function(name) {
+            return this.list.find(element => element.name === name);
+        },
+
+        this.joinGame = function (name, player) {
+            const game = this.findGame(name);
+            if (!game) {
+                this.createGame(name, player);
+            } else if(game && game.hasSlot()) {
+                console.log(player.id, 'joined game ', name);
+                game.addPlayer(player);
+                player.game = game;
+                player.send('joined');
+            }
+        }
+}
+
+function Game(name, p1 = null) {
+    this.name = name,
+        this.p1 = p1,
+        this.p2 = null,
+
+        this.addPlayer = function(newP) {
+            if ( !this.p2 ) {
+                this.p2 = newP;
+                this.p1.other = this.p2;
+                this.p2.other = this.p1;
+                this.isReady();
+            }
+        },
+
+        this.isReady = function() {
+            this.p1.send('ready');
+            this.p2.send('ready');
+        },
+
+        this.hasSlot = function () {
+            return !this.p1 || !this.p2;
+        }
+
+    //END GAME
+
+}
