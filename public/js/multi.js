@@ -45,7 +45,7 @@ class Multi {
         });
 
         this.socket.on("addAction", function (data) {
-            console.log('action received: ', data.action.action);
+            // console.log('action received: ', data.action.action);
             game.board.actions.addAction(
                 game.board.actions.jsonToAction(data.action.action)
             );

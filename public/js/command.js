@@ -116,6 +116,7 @@ class ActionManager {
     }
 
     addAction(action) {
+        console.log('Action to execute', action);
         if (action.execute()) {
             console.log('Action executed');
             // On supprime toutes les actions "UNDO"
@@ -180,10 +181,10 @@ class ActionManager {
 
     jsonToAction (json) {
         const cells = game.board.cells;
-        const source = cells[json.action.source];
-        const target = cells[json.action.target];
+        const source = cells[json.source];
+        const target = cells[json.target];
         let action = null;
-        switch (json.action.type) {
+        switch (json.type) {
             case 'rotate' :
                 action = new ActionRotate(source,target);
                 break;
@@ -193,7 +194,7 @@ class ActionManager {
             default:
                 new Action(source,target);
         }
-        action.isChain = json.action.chain;
+        action.isChain = json.chain;
         action.sent = true;
         return action;
     }
@@ -209,10 +210,10 @@ class Action {
     }
 
     json () {
-        // console.log("JSONING");
+        console.log("JSONING", this);
         return {
-            source:this.source.index || '',
-            target:this.target.index || '' ,
+            source:this.source.id,
+            target:this.target.id,
             chain:this.isChain,
             type:this.type()
         }
@@ -224,7 +225,7 @@ class Action {
 
     canSend() {
         // console.log('can send ? multi = ',game.multi.isActive, 'action sent', this.sent)
-        return game.multi.isActive && !this.sent;
+        return game.multi.isActive && !this.sent && !this.isChain;
     }
 
 }
@@ -256,7 +257,7 @@ class ActionMove extends Action {
 
 
     isValide() {
-        return this.target.isValidMove(this.source.piece);
+        return this.sent || this.target.isValidMove(this.source.piece);
     }
 
     type() {
@@ -290,7 +291,7 @@ class ActionRotate extends Action{
     }
 
     isValide() {
-        return this.source.isValidRotation(this.source.piece);
+        return  this.sent || this.source.isValidRotation(this.source.piece);
     }
 
     type() {

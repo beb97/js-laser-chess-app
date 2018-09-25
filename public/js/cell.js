@@ -1,7 +1,7 @@
 class Cell {
 
-    constructor(index) {
-        this.index = index;
+    constructor(id) {
+        this.id = id;
         this.piece = null;
         this.player = null;
     }
@@ -54,11 +54,11 @@ class Cell {
     }
 
     x() {
-        return this.index % settings.boardwidth;
+        return this.id % settings.boardwidth;
     }
 
     y() {
-        return Math.trunc( this.index / settings.boardwidth);
+        return Math.trunc( this.id / settings.boardwidth);
     }
 
     getCoord() {
@@ -84,7 +84,7 @@ class Cell {
 
     isValidGenerique(piece) {
         if(!piece.player.isCurrent()) {return false;}
-        if(game.multi.isActive && !game.multi.player.isCurrent()) {return false;}
+        if(game.multi.isActive && (!game.multi.player.isCurrent())) {return false;}
 
         return true;
     }
