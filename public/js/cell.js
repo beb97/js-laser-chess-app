@@ -32,7 +32,7 @@ class Cell {
 
     drawPiece() {
         if (  this.hasPiece() ) {
-            this.piece.draw(this.getCenter());
+            this.piece.drawClassic(this.getCenter());
         }
     }
 

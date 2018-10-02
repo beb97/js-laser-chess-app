@@ -31,8 +31,10 @@ class Board {
         }
 
         this.rayPather.draw();
-
-        prompt.html(this.text);
+        const current = game.board.commands.getCurrentPiece();
+        if(current) {
+            current.drawRotating();
+        }
     }
 
     playersColorDraw() {
