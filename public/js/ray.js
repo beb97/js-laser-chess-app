@@ -24,8 +24,8 @@ class Ray {
             line(0, 0,
                 0 + size/2 * this.to.x(),
                 0 + size/2 * this.to.y());
-            pop();
         }
+        pop();
     }
 
     react() {
