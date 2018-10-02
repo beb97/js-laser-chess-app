@@ -3,12 +3,9 @@ var game;
 var settings;
 // IHM
 var cnv;
-var logo;
-var button;
-var prompt;
-
 
 function setup() {
+    // frameRate(5);
     frameRate(25);
     angleMode(DEGREES);
     game = new Game();
@@ -86,20 +83,9 @@ class Game {
     }
 
     draw() {
-
-        cnv = this.getCanevasSize();
         // CANEVAS
+        cnv = this.getCanevasSize();
         createCanvas(cnv.x, cnv.y).parent('canevas');
-
-        // PROMPT
-        prompt = select('#prompt');
-
-        // // Sliders
-        // for (let player of game.board.players.list) {
-        //     player.createSlider();
-        //     player.setSliderSize();
-        // }
-
     }
 
     mouseCoord() {
@@ -107,9 +93,14 @@ class Game {
     }
 
     getCanevasSize() {
-        const cWidth = $('#canevas').width();
+        const cWidthIni = $('#canevas').width();
+        const cWidth = constrain(cWidthIni, 100, 600);
         game.settings.cellSize = cWidth / game.settings.boardwidth;
         const cHeight = game.settings.cellSize  * game.settings.boardHeight +1;
         return createVector(cWidth,cHeight);
+    }
+
+    prompt(message) {
+        $('#prompt').text(message);
     }
 }
