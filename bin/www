@@ -13,6 +13,7 @@ var http = require('http');
  * Get port from environment and store in Express.
  */
 
+// var port = normalizePort(process.env.PORT || 63342);
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
@@ -91,7 +92,7 @@ function onListening() {
 }
 
 /// MY CODE
-var io = require ('socket.io') (server, {});
+var io = require ('socket.io').listen(server);
 var games = new Games();
 var sockets = [];
 
@@ -167,11 +168,12 @@ function Games() {
             const game = this.findGame(name);
             if (!game) {
                 this.createGame(name, player);
-            } else if(game && game.hasSlot()) {
+            } else if(game && game.canJoin(player)) {
                 console.log(player.id, 'joined game ', name);
+
+                player.send('joined');
                 game.addPlayer(player);
                 player.game = game;
-                player.send('joined');
             }
         }
 }
@@ -195,8 +197,10 @@ function Game(name, p1 = null) {
             this.p2.send('ready');
         },
 
-        this.hasSlot = function () {
-            return !this.p1 || !this.p2;
+        this.canJoin = function (player) {
+            if (this.p1 && this.p2) return false ;
+            if (this.p1 === player) return false;
+            return true;
         }
 
     //END GAME

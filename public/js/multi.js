@@ -3,8 +3,9 @@ class Multi {
         this.isActive = false;
         this.player = null;
         this.undo = false;
+        // this.socket = io.connect('http://localhost:3000');
         this.socket = io();
-        this.socketInit();
+        this.socketInit(this.socket);
     }
 
     allowUndo() {
@@ -18,18 +19,27 @@ class Multi {
     }
 
     sendAction(action) {
-            this.socket.emit('sendAction',{
-                action:action
-            });
-            // console.log("action sent", action);
+        this.socket.emit('sendAction',{
+            action:action
+        });
+        // console.log("action sent", action);
     }
 
-    socketInit() {
-            this.socket.emit('join',{
-                name:$("#gameName").val()
-            });
+    socketInit(socket) {
+        socket.emit('join',{
+            name:$("#gameName").val()
+        });
 
-        this.socket.on("game", function(data){
+        socket.on('connect_error', () => {
+            console.log('connection_error');
+            socket.disconnect();
+        });
+
+        socket.on('disconnect', () => {
+            console.log('Disconnect from server');
+        });
+
+        socket.on("game", (data) => {
             console.log('serv : ', data.status);
             if(data.status === 'ready') {
                 game.reset();
@@ -42,9 +52,10 @@ class Multi {
             } else if (data.status === 'joined') {
                 game.multi.player = game.board.players.list[1];
             }
+            game.prompt('game '+data.status);
         });
 
-        this.socket.on("addAction", function (data) {
+        socket.on("addAction", function (data) {
             // console.log('action received: ', data.action.action);
             game.board.actions.addAction(
                 game.board.actions.jsonToAction(data.action.action)
