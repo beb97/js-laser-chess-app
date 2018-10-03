@@ -35,7 +35,7 @@
         #canevas{}
         #prompt {height: 33px;}
         #title {margin: auto;}
-        .card-body {padding: 1.25rem 0.25rem ;}
+        .card-body {padding: 0.25rem 0.25rem ;}
         form {margin-bottom: 0;}
     </style>
 </head>
@@ -55,7 +55,7 @@
         <div class="col-3">
             <div id="p1" class="card" style="max-width: 100%;">
                 <div class="card-body">
-                    <h5 class="card-title">P1</h5>
+                    <h5 class="card-title">P1<span id="pname1" ></span></h5>
                     <span id="slider1"></span>
                 </div>
             </div>
@@ -64,14 +64,15 @@
 
         <div class="col-6">
             <div id="chat" class="card" style="max-width: 100%;">
-                <div class="card-body">
-                    <div id="chatText" style="overflow-y: scroll">
-
+                <div class="card-body align-content-center">
+                    <div>
+                        <div class="text-center">
+                            <input class="text-center" id="gameName" type="text" name="game" placeholder="Game Name" size="4" value="s"/>
+                            <input type="button" onclick="game.multi.sendGameName('join')" value="join game"/>
+                        </div>
+                        <div id="prompt" class="text-muted text-center"></div>
                     </div>
 
-                    <form>
-                        <input id="chatInput" type="text" name="chatInput" placeholder="Your message" value="" style="max-width: 100%;"/>
-                    </form>
                 </div>
             </div>
 
@@ -80,7 +81,7 @@
         <div class="col-3">
             <div id="p2" class="card pull-right" style="max-width: 100%;">
                 <div class="card-body">
-                    <h5 class="card-title">P2</h5>
+                    <h5 class="card-title">P2 <span id="pname2" ></span></h5>
                     <span id="slider2"></span>
                 </div>
             </div>
@@ -97,14 +98,8 @@
 
     <div class = "row">
         <div class="col text-center">
-            <!--<div id="prompt"></div>-->
             <h4></h4>
             <div>
-                <!--<button id="reset" onclick="game.reset()">Redémarer</button>-->
-                <input id="gameName" type="text" name="game" placeholder="Game Name" value="s"/>
-                <!--<input type="button" onclick="game.multi.sendGameName('create')" value="create"></input>-->
-                <input type="button" onclick="game.multi.sendGameName('join')" value="join game"/>
-                <span class="text-muted" id="prompt"></span>
             </div>
             <h4></h4>
         </div>

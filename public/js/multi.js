@@ -49,8 +49,12 @@ class Multi {
                 game.reset();
             } else if (data.status === 'created') {
                 game.multi.player = game.board.players.list[0];
+                $('#pname1').text(' (me)');
+                $('#pname2').text('');
             } else if (data.status === 'joined') {
                 game.multi.player = game.board.players.list[1];
+                $('#pname2').text(' (me)');
+                $('#pname1').text('');
             }
             game.prompt('game '+data.status);
         });
