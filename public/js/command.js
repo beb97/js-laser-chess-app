@@ -31,7 +31,6 @@ class CommandManager {
     }
 
     getCurrentPiece() {
-        // return this.command(1).piece;
         return (this.command(1) && this.command(1).hasPiece()) ? this.command(1).cell.piece : null;
     }
 
@@ -48,11 +47,6 @@ class CommandManager {
                 game.board.actions.redo();
                 this.clear();
 
-            } else if( this.command(1).isMouse(RIGHT) && this.command(1).hasPiece()) {
-
-                game.board.actions.addAction(new ActionRotate(this.command(1).cell, this.command(1).cell));
-                this.clear();
-
             } else if( !this.command(1).hasCell() ) {
                 this.clear();
             } else if ( !this.command(1).hasPiece() ) {
@@ -64,7 +58,12 @@ class CommandManager {
             if( this.command(1).isMouse(LEFT) && this.command(1).hasPiece()
                 && this.command(2).isMouse(LEFT) && this.command(2).hasCell() ) {
 
-                game.board.actions.addAction( new ActionMove(this.command(1).cell,this.command(2).cell) );
+                if( this.command(1).cell.isNeighboor(this.command(2).cell, 1.5) ) {
+                    game.board.actions.addAction( new ActionMove(this.command(1).cell,this.command(2).cell) );
+                } else if (this.command(1).cell.isNeighboor(this.command(2).cell, 2)) {
+
+                    game.board.actions.addAction( new ActionRotate(this.command(1).cell,this.command(2).cell) );
+                }
                 this.clear();
 
             }
@@ -104,7 +103,7 @@ class Command {
     }
 
     hasPiece() {
-        return this.hasCell() && this.cell.hasPiece();
+        return this.hasCell() && this.cell.hasPiece() && this.cell.piece.belongToCurrentPlayer();
     }
 
 }
@@ -125,8 +124,9 @@ class ActionManager {
             this.actions.push(action);
             this.current = this.current+1;
 
+
+
             if(action.canSend()) {
-                // console.log('sending this action', action.type())
                 game.multi.sendAction(action.json());
             }
         }
@@ -281,12 +281,20 @@ class ActionRotate extends Action{
     }
 
     do() {
-        this.source.piece.orientation.rotateClock();
+        if(this.source.x() == this.target.x()) {
+            this.source.piece.orientation.rotateClock();
+        } else {
+            this.source.piece.orientation.rotateAntiClock();
+        }
         this.nextPlayer();
     }
 
     undo() {
-        this.source.piece.orientation.rotateAntiClock();
+        if(this.source.x() == this.target.x()) {
+            this.source.piece.orientation.rotateAntiClock();
+        } else {
+            this.source.piece.orientation.rotateClock();
+        }
         this.nextPlayer();
     }
 
@@ -331,3 +339,36 @@ class ActionKill extends Action{
         return 'kill';
     }
 }
+
+
+// class ActionSwitch extends Action{
+//     constructor(source, target) {
+//         super(source, target);
+//         this.isChain = true;
+//     }
+//
+//     execute() {
+//         if (this.isValide()) {
+//             this.do();
+//             return true;
+//         } else {
+//             return false;
+//         }
+//     }
+//
+//     do() {
+//         this.source.piece.switch();
+//     }
+//
+//     undo() {
+//         this.source.piece.switch();
+//     }
+//
+//     isValide() {
+//         return this.source.hasPiece() && this.piece instanceof Laser;
+//     }
+//
+//     type() {
+//         return 'switch';
+//     }
+// }
