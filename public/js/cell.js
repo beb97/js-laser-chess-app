@@ -11,7 +11,8 @@ class Cell {
         this.drawBackGround();
     }
 
-    setDrawingParameters() {const backGroundColor = this.getBackgroundColor();
+    setDrawingParameters() {
+        const backGroundColor = this.getBackgroundColor();
         fill(backGroundColor);
         const borderColor = (this === game.board.getCurrentCell()) ? settings.cellStrokeColorHover: settings.cellStrokeColor;
         const borderWeight = (this === game.board.getCurrentCell()) ? settings.cellStrokeHover : settings.cellStroke;
@@ -24,12 +25,15 @@ class Cell {
         rect(corner.x, corner.y, settings.cellSize, settings.cellSize);
     }
 
+    drawMoveTarget() {
+        push();
+        fill(color(250,250,0,100));
+        this.drawBackGround();
+        pop();
+    }
+
     getBackgroundColor() {
         let backgroundColor = (this.player !== null) ? this.player.getColorAlpha(settings.cellColorPlayerAlpha) : settings.cellColor;
-        let movingPiece = game.board.commands.getCurrentPiece();
-        if(movingPiece && this.isValidMove(movingPiece)) {
-            backgroundColor = settings.cellColorTarget;
-        }
         return backgroundColor;
     }
 

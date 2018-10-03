@@ -112,24 +112,32 @@ class ActionManager {
     constructor() {
         this.actions = [];
         this.current = 0;
+        this.last = null;
     }
 
-    addAction(action) {
-        console.log('Action to execute', action);
-        if (action.execute()) {
+    execute() {
+        if (this.last && this.last.execute()) {
             console.log('Action executed');
             // On supprime toutes les actions "UNDO"
             // Pour reprendre la ligne d'action a partir d'ici
             this.actions.length = this.current;
-            this.actions.push(action);
+            this.last.executed = true;
+            this.actions.push(this.last);
             this.current = this.current+1;
 
-
-
-            if(action.canSend()) {
-                game.multi.sendAction(action.json());
+            if(this.last.canSend()) {
+                game.multi.sendAction(this.last.json());
             }
+            // On vide l'action pour finir
+            this.last = null;
+            return this.actions.last();
         }
+        return false;
+    }
+
+    addAction(action) {
+        console.log('Action to add', action);
+        this.last = action;
         return this;
     }
 
@@ -207,6 +215,7 @@ class Action {
         this.target = target;
         this.isChain = false;
         this.sent = false;
+        this.executed = false;
     }
 
     json () {
@@ -217,10 +226,6 @@ class Action {
             chain:this.isChain,
             type:this.type()
         }
-    }
-
-    nextPlayer() {
-        game.board.players.nextPlayer();
     }
 
     canSend() {
@@ -247,12 +252,10 @@ class ActionMove extends Action {
 
     do() {
         this.source.piece.move(this.target);
-        this.nextPlayer();
     }
 
     undo() {
         this.target.piece.move(this.source);
-        this.nextPlayer();
     }
 
 
@@ -286,7 +289,6 @@ class ActionRotate extends Action{
         } else {
             this.source.piece.orientation.rotateAntiClock();
         }
-        this.nextPlayer();
     }
 
     undo() {
@@ -295,7 +297,6 @@ class ActionRotate extends Action{
         } else {
             this.source.piece.orientation.rotateClock();
         }
-        this.nextPlayer();
     }
 
     isValide() {

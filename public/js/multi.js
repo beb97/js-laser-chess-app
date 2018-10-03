@@ -27,7 +27,8 @@ class Multi {
 
     socketInit(socket) {
         socket.emit('join',{
-            name:$("#gameName").val()
+            name:$("#gameName").val(),
+            player:$("#playerName").val()
         });
 
         socket.on('connect_error', () => {

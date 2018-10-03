@@ -5,29 +5,25 @@ class RayPather {
     }
 
     draw() {
-        this.rayPaths = this.generateAllRayPaths(this.getLasers());
         for( let rayPath of this.rayPaths ){
-            rayPath.draw();
+            if(rayPath.laser.on) {
+                rayPath.draw();
+            }
         }
     }
 
     getLasers() {
-        let laserCells = [];
-        const cells = game.board.cells;
-        for( let cell of cells ){
-            if(cell.piece && cell.piece instanceof Laser) {
-                laserCells.push(cell);
-            }
-        }
-        return laserCells;
+        return game.board.players.current.laser.cell;
     }
 
-    generateAllRayPaths(laserCells) {
+    generateAllRayPaths(laserCell) {
         let rayPaths = [];
-        for( let laserCell of laserCells ){
-            rayPaths.push(new RayPath(laserCell));
-        }
+        rayPaths.push(new RayPath(laserCell));
         return rayPaths;
+    }
+
+    update() {
+        this.rayPaths = this.generateAllRayPaths(this.getLasers());
     }
 
 }
@@ -55,7 +51,7 @@ class RayPath {
             this.nextCell(),
             this.rayPath.last().to.getOpposite(),
             this.rayPath.last().to.copy()
-            ).react();
+        ).react();
     }
 
     hasNextCell() {

@@ -5,13 +5,18 @@ class Player {
         this.slider = null;
         this.pieces = [];
         this.cells = [];
+        this.laser = null;
         this.initialColor = pColor;
+        this.lost = false;
         this.createSlider();
         this.setSliderSize();
     }
 
     addPiece(piece) {
         piece.player = this;
+        if(piece instanceof Laser) {
+            this.laser = piece;
+        }
         this.pieces.push(piece);
     }
 

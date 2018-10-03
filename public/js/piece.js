@@ -20,9 +20,10 @@ class Piece {
         this.cell.piece = this;
     }
 
-    kill() {
+    kill(ray) {
         game.board.actions.addAction(new ActionKill(this.cell, null));
-        game.board.actions.addAction(new ActionSwitch(this.cell.player.laser, null));
+        ray.block();
+        game.board.effects.push(new Effect(this.cell, 3*fps, this.player.color));
     }
 
     touchedFrom(ray) {
@@ -45,26 +46,13 @@ class Piece {
         return center;
     }
 
-    snap(distanceRequired) {
-        let center = createVector(mouseX, mouseY);
-        const closestCell = game.board.getCurrentCell();
-        if (closestCell) {
-            const distanceFromClosestCell = closestCell.getCenter().dist(createVector(mouseX, mouseY));
-            if( distanceFromClosestCell < distanceRequired ) {
-                center = closestCell.getCenter();
-            }
-
-        }
-        return center;
-    }
-
     setDrawAttributes() {
         const center = this.getPieceCenter();
         const borderColor = (this.cell === game.board.getCurrentCell() ) ? settings.pieceStrokeColorHover : settings.pieceStrokeColor;
         translate(center.x, center.y);
 
         strokeWeight(settings.pieceStroke);
-        // stroke(borderColor);
+        stroke(borderColor);
         fill(this.cell.piece.player.color);
         rotate(this.orientation.value);
     }
@@ -75,6 +63,7 @@ class Piece {
         this.draw();
         pop();
     }
+
 
     drawRotationTarget() {
         const top = game.board.get( this.cell.x(), this.cell.y() - 2 );
@@ -89,8 +78,7 @@ class Piece {
             if(cell) {
 
                 push();
-                fill(color(250,250,0,200));
-                cell.drawBackGround();
+                cell.drawMoveTarget();
                 const center = cell.getCenter();
                 stroke('red');
                 strokeWeight(3);
@@ -129,11 +117,11 @@ class Laser extends Piece {
 
     constructor(cell, orientation = new Orientation()) {
         super(cell, orientation);
-        this.on = false;
+        this.on = true;
     }
 
     react() {
-        this.kill();
+        this.kill(ray);
     }
 
     draw() {
@@ -153,7 +141,7 @@ class Laser extends Piece {
     isSwapable() {
         return false;
     }
-    //
+
     // switch() {
     //     this.on = !this.on;
     // }
@@ -175,7 +163,7 @@ class Mirror extends Piece {
                 ray.to.rotateAntiClock();
                 break;
             default:
-                this.kill();
+                this.kill(ray);
         }
     }
 
@@ -195,8 +183,14 @@ class King extends Piece {
     react(ray) {
         switch (this.touchedFrom(ray)) {
             default:
-                this.kill();
+                this.kill(ray);
         }
+    }
+
+    kill(ray) {
+        super.kill(ray);
+        this.player.lost = true;
+        game.board.isOver();
     }
 
     draw() {
@@ -235,7 +229,7 @@ class Guard extends Piece {
                 ray.block();
                 break;
             default:
-                this.kill();
+                this.kill(ray);
         }
         return ray;
     }

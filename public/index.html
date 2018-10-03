@@ -23,13 +23,13 @@
     <script language="javascript" type="text/javascript" src="js/command.js"></script>
     <script language="javascript" type="text/javascript" src="js/player.js"></script>
     <script language="javascript" type="text/javascript" src="js/multi.js"></script>
-    <script language="javascript" type="text/javascript" src="js/sketch.js"></script>
+    <script language="javascript" type="text/javascript" src="js/game.js"></script>
     <!-- <script language="javascript" type="text/javascript" src="js/xxx.js"></script> -->
 
     <link rel="stylesheet" href="css/bootstrap.css" type="text/css" />
 
     <style>
-        body {background-color: grey;}
+        body {background-color: white;}
         main {background: white; margin: auto;}
         button {margin-top: 5px; margin-bottom: 10px;}
         #canevas{}
@@ -45,8 +45,7 @@
         <div class="col text-center">
             <h1 id="title"><a href="../index.html"><i id="logo" class=" fas fa-chess"></i></a> Laser Chess</h1>
             <p class="font-italic">
-                left click to move <br/>
-                right click to rotate
+                left click to move or rotate
             </p>
         </div>
     </div>
@@ -67,8 +66,12 @@
                 <div class="card-body align-content-center">
                     <div>
                         <div class="text-center">
-                            <input class="text-center" id="gameName" type="text" name="game" placeholder="Game Name" size="4" value="s"/>
-                            <input type="button" onclick="game.multi.sendGameName('join')" value="join game"/>
+                            <form>
+
+                                <input class="text-center" id="playerName" type="text" name="name" placeholder="name" size="6" value="" required/>
+                                <input class="text-center" id="gameName" type="text" name="game" placeholder="game" size="6" value="" required/>
+                                <input type="button" onclick="game.multi.sendGameName('join')" value="join game"/>
+                            </form>
                         </div>
                         <div id="prompt" class="text-muted text-center"></div>
                     </div>
@@ -91,7 +94,7 @@
     <div class = "row">
 
         <!-- oncontextmenu TO PREVENT RIGHT CLICK OPENING -->
-        <div id="canevas" class="col" oncontextmenu="event.preventDefault();">
+        <div id="canevas" class="col text-center" oncontextmenu="event.preventDefault();">
 
         </div>
     </div>

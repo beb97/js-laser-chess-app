@@ -1,12 +1,13 @@
 // Game
 var game;
 var settings;
+var fps = 25;
 // IHM
 var cnv;
 
 function setup() {
     // frameRate(5);
-    frameRate(25);
+    frameRate(fps);
     angleMode(DEGREES);
     game = new Game();
     settings = game.settings;
@@ -26,7 +27,6 @@ function keyPressed() {
         game.board.commands.handleKey();
 }
 
-
 function windowResized() {
     cnv = game.getCanevasSize();
     resizeCanvas(cnv.x, cnv.y);
@@ -35,7 +35,6 @@ function windowResized() {
         player.setSliderSize();
     }
 }
-
 
 class Settings {
     constructor(boardwidth = 10, boardHeight = 8) {
@@ -76,6 +75,7 @@ class Game {
     }
 
     update() {
+        this.board.update();
     }
 
     withinCanevas(x,y) {
