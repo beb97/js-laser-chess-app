@@ -7,17 +7,20 @@ class Cell {
     }
 
     draw() {
+        this.setDrawingParameters();
         this.drawBackGround();
     }
 
-    drawBackGround() {
-        const corner = this.getTopLeftCorner();
-        const backGroundColor = this.getBackgroundColor();
+    setDrawingParameters() {const backGroundColor = this.getBackgroundColor();
         fill(backGroundColor);
         const borderColor = (this === game.board.getCurrentCell()) ? settings.cellStrokeColorHover: settings.cellStrokeColor;
         const borderWeight = (this === game.board.getCurrentCell()) ? settings.cellStrokeHover : settings.cellStroke;
         stroke(borderColor);
         strokeWeight(borderWeight);
+    }
+
+    drawBackGround() {
+        const corner = this.getTopLeftCorner();
         rect(corner.x, corner.y, settings.cellSize, settings.cellSize);
     }
 
@@ -71,6 +74,7 @@ class Cell {
 
     isNeighboor(cell, distance = 1) {
         if (cell === this) {return false}
+        // console.log(this.getCoord().dist( cell.getCoord()));
         return ( distance >= this.getCoord().dist( cell.getCoord())  );
     }
 
@@ -101,6 +105,7 @@ class Cell {
 
         return true;
     }
+
 
     isValidRotation(piece) {
         if(!this.isValidGenerique(piece)) {return false;}

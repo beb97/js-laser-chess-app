@@ -27,13 +27,14 @@ class Board {
         }
 
         for( let cell of this.cells ){
+
             cell.drawPiece();
         }
-
         this.rayPather.draw();
+
         const current = game.board.commands.getCurrentPiece();
-        if(current) {
-            current.drawRotating();
+        if(current && current.cell.isValidRotation(current)) {
+            current.drawRotationTarget();
         }
     }
 

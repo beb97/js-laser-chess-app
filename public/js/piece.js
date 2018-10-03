@@ -22,6 +22,7 @@ class Piece {
 
     kill() {
         game.board.actions.addAction(new ActionKill(this.cell, null));
+        game.board.actions.addAction(new ActionSwitch(this.cell.player.laser, null));
     }
 
     touchedFrom(ray) {
@@ -40,12 +41,7 @@ class Piece {
     }
 
     getPieceCenter() {
-        let center;
-        if(this.isMoving() && game.board.currentAction == 'MOVE' && this.belongToCurrentPlayer() ) {
-            center = this.snap(settings.cellSize / 3);
-        } else {
-            center = this.cell.getCenter()
-        }
+        let center = this.cell.getCenter();
         return center;
     }
 
@@ -62,27 +58,51 @@ class Piece {
         return center;
     }
 
-    isMoving() {
-        return this === game.board.movingPiece;
-    }
-
     setDrawAttributes() {
         const center = this.getPieceCenter();
         const borderColor = (this.cell === game.board.getCurrentCell() ) ? settings.pieceStrokeColorHover : settings.pieceStrokeColor;
-        let extraAngle = 0;
         translate(center.x, center.y);
-        // if(this.isMoving() && game.board.currentAction == 'ROTATE' && this.cell !== game.board.getCurrentCell()) {
-        //     extraAngle = game.mouseCoord().sub(this.cell.getCenter()).heading();
-        //     console.log(extraAngle);
-        // }
+
         strokeWeight(settings.pieceStroke);
-        stroke(borderColor);
+        // stroke(borderColor);
         fill(this.cell.piece.player.color);
         rotate(this.orientation.value);
-        // rotate(this.orientation.value + extraAngle);
-
-
     }
+
+    drawClassic() {
+        push();
+        this.setDrawAttributes();
+        this.draw();
+        pop();
+    }
+
+    drawRotationTarget() {
+        const top = game.board.get( this.cell.x(), this.cell.y() - 2 );
+        const bot = game.board.get( this.cell.x(), this.cell.y() + 2 );
+        const left = game.board.get( this.cell.x() - 2, this.cell.y() );
+        const right = game.board.get( this.cell.x() + 2, this.cell.y() );
+
+        const cells = [top, left, bot, right];
+
+        let angle = 90;
+        for (let cell of cells) {;
+            if(cell) {
+
+                push();
+                fill(color(250,250,0,200));
+                cell.drawBackGround();
+                const center = cell.getCenter();
+                stroke('red');
+                strokeWeight(3);
+                translate(center.x, center.y);
+                rotate(this.orientation.value + angle);
+                this.draw()
+                pop();
+            }
+            angle +=180;
+        }
+    }
+
 
     isMovable() {
         return true;
@@ -109,6 +129,7 @@ class Laser extends Piece {
 
     constructor(cell, orientation = new Orientation()) {
         super(cell, orientation);
+        this.on = false;
     }
 
     react() {
@@ -117,12 +138,8 @@ class Laser extends Piece {
 
     draw() {
         let size = settings.cellSize;
-
-        push();
-        this.setDrawAttributes();
         ellipse(0,0, size);
         line(0, 0, (size/3), 0);
-        pop();
     }
 
     initRay() {
@@ -136,6 +153,10 @@ class Laser extends Piece {
     isSwapable() {
         return false;
     }
+    //
+    // switch() {
+    //     this.on = !this.on;
+    // }
 
 }
 
@@ -147,26 +168,22 @@ class Mirror extends Piece {
 
     react(ray) {
         switch (this.touchedFrom(ray)) {
-        case 0:
-            ray.to.rotateClock();
-            break;
-        case 90:
-            ray.to.rotateAntiClock();
-            break;
-        default:
-            this.kill();
+            case 0:
+                ray.to.rotateClock();
+                break;
+            case 90:
+                ray.to.rotateAntiClock();
+                break;
+            default:
+                this.kill();
         }
     }
 
     draw() {
-        let size = settings.cellSize / 1.2;
-        let length = size / 2;
-        push();
-        this.setDrawAttributes();
+        let length = settings.cellSize/ 1.2 / 2;
         triangle( - length, - length, -length, length, length, length);
-        pop();
-
     }
+
 }
 
 class King extends Piece {
@@ -184,11 +201,7 @@ class King extends Piece {
 
     draw() {
         let size = settings.cellSize;
-        push();
-        this.setDrawAttributes();
         this.star(0,0, size/3, size/2.1, 6);
-
-        pop();
     }
 
     star(x, y, radius1, radius2, npoints) {
@@ -229,13 +242,9 @@ class Guard extends Piece {
 
     draw() {
         let size = settings.cellSize / 1.2;
-        push();
-        this.setDrawAttributes();
         rectMode(CENTER);
         const angleSize = size/2;
         rect( 0, 0, size, size,angleSize , 0, 0, angleSize);
-
-        pop();
     }
 }
 
@@ -266,12 +275,9 @@ class DoubleMirror extends Piece {
 
     draw() {
         let size = settings.cellSize;
-        push();
-        this.setDrawAttributes();
         rectMode(CENTER);
         rotate(45);
         rect( 0,0, size, size/4);
-        pop();
     }
 
     canSwap() {
