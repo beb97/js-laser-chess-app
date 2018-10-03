@@ -2,6 +2,7 @@ class Player {
 
     constructor(name, pColor = 100) {
         this.id = name;
+        this.name = '';
         this.slider = null;
         this.pieces = [];
         this.cells = [];

@@ -54,7 +54,7 @@
         <div class="col-3">
             <div id="p1" class="card" style="max-width: 100%;">
                 <div class="card-body">
-                    <h5 class="card-title">P1<span id="pname1" ></span></h5>
+                    <h5 class="card-title"><span id="pname1" ></span></h5>
                     <span id="slider1"></span>
                 </div>
             </div>
@@ -66,12 +66,12 @@
                 <div class="card-body align-content-center">
                     <div>
                         <div class="text-center">
-                            <form>
+                            <!--<form>-->
 
                                 <input class="text-center" id="playerName" type="text" name="name" placeholder="name" size="6" value="" required/>
                                 <input class="text-center" id="gameName" type="text" name="game" placeholder="game" size="6" value="" required/>
                                 <input type="button" onclick="game.multi.sendGameName('join')" value="join game"/>
-                            </form>
+                            <!--</form>-->
                         </div>
                         <div id="prompt" class="text-muted text-center"></div>
                     </div>
@@ -84,7 +84,7 @@
         <div class="col-3">
             <div id="p2" class="card pull-right" style="max-width: 100%;">
                 <div class="card-body">
-                    <h5 class="card-title">P2 <span id="pname2" ></span></h5>
+                    <h5 class="card-title"><span id="pname2" ></span></h5>
                     <span id="slider2"></span>
                 </div>
             </div>
@@ -94,7 +94,8 @@
     <div class = "row">
 
         <!-- oncontextmenu TO PREVENT RIGHT CLICK OPENING -->
-        <div id="canevas" class="col text-center" oncontextmenu="event.preventDefault();">
+        <div id="canevas" class="col text-center">
+        <!--<div id="canevas" class="col text-center" oncontextmenu="event.preventDefault();">-->
 
         </div>
     </div>
@@ -103,6 +104,7 @@
         <div class="col text-center">
             <h4></h4>
             <div>
+                <button id="reset" onclick="game.reset()">Redémarer</button>
             </div>
             <h4></h4>
         </div>

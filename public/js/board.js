@@ -120,7 +120,9 @@ class Board {
                         piece.cell.piece = null;
                     }
                 }
+                player.laser.on = false;
                 player.pieces.length = 0;
+                game.prompt(player.name + ' DEFETEAD');
             }
         }
     }

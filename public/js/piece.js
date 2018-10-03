@@ -120,8 +120,8 @@ class Laser extends Piece {
         this.on = true;
     }
 
-    react() {
-        this.kill(ray);
+    react(ray) {
+        ray.block();
     }
 
     draw() {

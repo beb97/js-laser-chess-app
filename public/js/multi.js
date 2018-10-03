@@ -14,7 +14,8 @@ class Multi {
 
     sendGameName(action) {
         this.socket.emit(action,{
-            name:$("#gameName").val()
+            game:$("#gameName").val(),
+            player:$("#playerName").val()
         });
     }
 
@@ -41,21 +42,28 @@ class Multi {
         });
 
         socket.on("game", (data) => {
-            console.log('serv : ', data.status);
+            console.log('serv : ', data);
             if(data.status === 'ready') {
                 game.reset();
                 game.multi.isActive = true;
+                $('#pname1').text(data.p1);
+                $('#pname2').text(data.p2);
+                game.board.players.list[0].name = data.p1;
+                game.board.players.list[1].name = data.p2;
             } else if (data.status === 'over') {
                 game.multi.isActive = false;
+                $('#pname1').text('');
+                $('#pname2').text('');
                 game.reset();
             } else if (data.status === 'created') {
                 game.multi.player = game.board.players.list[0];
-                $('#pname1').text(' (me)');
-                $('#pname2').text('');
+                $('#pname1').text(data.p1);
             } else if (data.status === 'joined') {
                 game.multi.player = game.board.players.list[1];
-                $('#pname2').text(' (me)');
-                $('#pname1').text('');
+                $('#pname1').text(data.p1);
+                $('#pname2').text(data.p2);
+                game.board.players.list[0].name = data.p1;
+                game.board.players.list[1].name = data.p2;
             }
             game.prompt('game '+data.status);
         });

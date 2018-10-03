@@ -103,12 +103,16 @@ io.sockets.on ('connection', function (socket) {
     sockets[socket.id] = socket;
     socket.other = null;
     socket.game = null;
+    socket.player = null;
 
     console.log('connexion par socket', socket.id);
 
     socket.send = function(value) {
+
         socket.emit('game', {
-            status:value
+            status:value,
+            p1:(socket.game && socket.game.p1) ? socket.game.p1.player : '',
+            p2:(socket.game && socket.game.p2) ? socket.game.p2.player : ''
         });
     };
 
@@ -130,7 +134,8 @@ io.sockets.on ('connection', function (socket) {
     });
 
     socket.on('join', function (data) {
-        games.joinGame(data.name, socket);
+        socket.player = data.player;
+        games.joinGame(data.game, socket);
     });
 
     socket.on('disconnect', function() {
@@ -165,16 +170,17 @@ function Games() {
         },
 
         this.joinGame = function (name, player) {
-            if(name != "") {
+            if(name && name !== '') {
                 const game = this.findGame(name);
                 if (!game) {
                     this.createGame(name, player);
+                    // console.log('post create player', player)
                 } else if(game && game.canJoin(player)) {
                     console.log(player.id, 'joined game ', name);
 
-                    player.send('joined');
                     game.addPlayer(player);
                     player.game = game;
+                    player.send('joined');
                 }
             }
 
